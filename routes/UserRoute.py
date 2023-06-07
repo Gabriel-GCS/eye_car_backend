@@ -2,31 +2,31 @@ import os
 
 from fastapi import APIRouter, HTTPException, Depends, Header, UploadFile
 from datetime import datetime
-from middlewares.JWTMiddleware import verificar_token
-from models.UsuarioModel import UserCreateModel, UsuarioAtualizarModel
+from middlewares.JWTMiddleware import token_verify
+from models.UserModel import UserCreateModel, UserUpdateModel
 from services.AuthService import AuthService
-from services.UserService import UsuarioService
+from services.UserService import UserService
 
 router = APIRouter()
 
-userService = UsuarioService()
+userService = UserService()
 authService = AuthService()
 
 
 @router.post("/", response_description="Route to create new user")
-async def create_user(file: UploadFile, usuario: UserCreateModel = Depends(UserCreateModel)):
+async def create_user(file: UploadFile, user: UserCreateModel = Depends(UserCreateModel)):
     try:
         photo_route = f'files/photo-{datetime.now().strftime("%H%M%S")}.png'
 
-        with open(photo_route, 'wb+') as arquivo:
-            arquivo.write(file.file.read())
+        with open(photo_route, 'wb+') as arquive:
+            arquive.write(file.file.read())
 
-        result = await userService.create_user(usuario, photo_route)
+        result = await userService.create_user(user, photo_route)
 
         os.remove(photo_route)
 
         if not result.status == 201:
-            raise HTTPException(status_code=result.status, detail=result.mensagem)
+            raise HTTPException(status_code=result.status, detail=result.message)
 
         return result
     except Exception as error:
@@ -35,86 +35,71 @@ async def create_user(file: UploadFile, usuario: UserCreateModel = Depends(UserC
 
 @router.get(
     '/me',
-    response_description='Route to list user info',
-    dependencies=[Depends(verificar_token)]
+    response_description='Route to list logged user info',
+    dependencies=[Depends(token_verify)]
     )
 async def info_logged_user(authorization: str = Header(default='')):
     try:
-        usuario_logado = await authService.find_logged_user(authorization)
+        user_logged = await authService.find_logged_user(authorization)
 
-        resultado = await userService.buscar_usuario(usuario_logado.id)
+        result = await userService.find_user(user_logged.id)
 
-        if not resultado.status == 200:
-            raise HTTPException(status_code=resultado.status, detail=resultado.mensagem)
+        if not result.status == 200:
+            raise HTTPException(status_code=result.status, detail=result.message)
 
-        return resultado
-    except Exception as erro:
-        raise erro
+        return result
+    except Exception as error:
+        raise error
 
 
 @router.get(
-    '/{usuario_id}',
-    response_description='Rota para buscar as informações do usuário logado.',
-    dependencies=[Depends(verificar_token)]
+    '/{user_id}',
+    response_description='Route to list user info',
+    dependencies=[Depends(token_verify)]
     )
-async def buscar_info_usuario(usuario_id: str):
+async def find_user_info(user_id: str):
     try:
-        resultado = await usuarioService.buscar_usuario(usuario_id)
+        result = await userService.find_user(user_id)
 
-        if not resultado.status == 200:
-            raise HTTPException(status_code=resultado.status, detail=resultado.mensagem)
+        if not result.status == 200:
+            raise HTTPException(status_code=result.status, detail=result.message)
 
-        return resultado
-    except Exception as erro:
-        raise erro
+        return result
+    except Exception as error:
+        raise error
 
 
 @router.get(
     '/',
-    response_description='Rota para listar todos usuários.',
-    dependencies=[Depends(verificar_token)]
+    response_description='Route to list all users',
+    dependencies=[Depends(token_verify)]
     )
-async def listar_usuarios(nome: str):
+async def list_users(name: str):
     try:
-        resultado = await usuarioService.listar_usuarios(nome)
+        result = await userService.list_users(name)
 
-        if not resultado.status == 200:
-            raise HTTPException(status_code=resultado.status, detail=resultado.mensagem)
+        if not result.status == 200:
+            raise HTTPException(status_code=result.status, detail=result.message)
 
-        return resultado
-    except Exception as erro:
-        raise erro
+        return result
+    except Exception as error:
+        raise error
 
 
 @router.put(
     '/me',
-    response_description='Rota para atualizar as informações do usuário logado.',
-    dependencies=[Depends(verificar_token)]
+    response_description='Route to update logged user',
+    dependencies=[Depends(token_verify)]
     )
-async def atualizar_usuario_logado(authorization: str = Header(default=''), usuario_atualizar: UsuarioAtualizarModel = Depends(UsuarioAtualizarModel)):
+async def update_user(authorization: str = Header(default=''), user_update: UserUpdateModel = Depends(UserUpdateModel)):
     try:
-        usuario_logado = await authService.buscar_usuario_logado(authorization)
+        user_logged = await authService.find_logged_user(authorization)
 
-        resultado = await usuarioService.atualizar_usuario_logado(usuario_logado.id, usuario_atualizar)
+        result = await userService.update_user(user_logged.id, user_update)
 
-        if not resultado.status == 200:
-            raise HTTPException(status_code=resultado.status, detail=resultado.mensagem)
+        if not result.status == 200:
+            raise HTTPException(status_code=result.status, detail=result.message)
 
-        return resultado
-    except Exception as erro:
-        raise erro
-
-@router.put(
-    '/seguir/{usuario_id}',
-    response_description="Rota para follow/unfollow em um usuário.",
-    dependencies=[Depends(verificar_token)]
-)
-async def follow_unfollow_usuario(usuario_id: str, authorization: str = Header(default='')):
-    usuario_logado = await authService.buscar_usuario_logado(authorization)
-
-    resultado = await usuarioService.follow_unfollow_usuario(usuario_logado.id, usuario_id)
-
-    if not resultado.status == 200:
-        raise HTTPException(status_code=resultado.status, detail=resultado.mensagem)
-
-    return resultado
+        return result
+    except Exception as error:
+        raise error

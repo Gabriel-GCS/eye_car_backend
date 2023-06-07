@@ -1,13 +1,13 @@
-from models.UsuarioModel import UserModel
+from models.UserModel import UserModel
 
 
 class ConverterUtil:
-    def user_converter(self, usuario):
+    def user_converter(self, user):
         return UserModel(
-            id=str(usuario["_id"]),
-            name=usuario["name"],
-            email=usuario["email"],
-            password=usuario["password"],
-            photo=usuario["photo"] if "photo" in usuario else "",
-            token=usuario["token"] if "token" in usuario else "",
+            id=str(user["_id"]),
+            name=user["name"],
+            email=user["email"],
+            password=user["password"],
+            photo=user["photo"] if "photo" in user else "",
+            token=user["token"] if "token" in user else "",
         )

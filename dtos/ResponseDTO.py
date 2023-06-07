@@ -1,5 +1,5 @@
 class ResponseDTO:
-    def __init__(self, mensagem, dados, status):
-        self.mensagem = mensagem
-        self.dados = dados
+    def __init__(self, message, data, status):
+        self.message = message
+        self.data = data
         self.status = status

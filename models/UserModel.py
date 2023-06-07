@@ -47,7 +47,7 @@ class UserCreateModel(BaseModel):
 
 class UserLoginModel(BaseModel):
     email: EmailStr = Field(...)
-    senha: str = Field(...)
+    password: str = Field(...)
 
     class Config:
         schema_extra = {

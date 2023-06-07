@@ -24,8 +24,8 @@ class AWSProvider:
             )
 
             return str(url).split('?')[0]
-        except ClientError as erro:
-            print(erro)
+        except ClientError as error:
+            print(error)
             return False
 
 

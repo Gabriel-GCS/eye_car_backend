@@ -4,9 +4,9 @@ import jwt
 from decouple import config
 
 from dtos.ResponseDTO import ResponseDTO
-from models.UsuarioModel import UsuarioLoginModel, UserModel
+from models.UserModel import UserLoginModel, UserModel
 from repositories.UserRepository import UserRepository
-from services.UserService import UsuarioService
+from services.UserService import UserService
 from utils.AuthUtil import AuthUtil
 
 JWT_SECRET = config('JWT_SECRET')
@@ -15,7 +15,7 @@ userRepository = UserRepository()
 
 authUtil = AuthUtil()
 
-usuarioService = UsuarioService()
+userService = UserService()
 
 
 class AuthService:
@@ -42,24 +42,24 @@ class AuthService:
             print(error)
             return None
 
-    async def login_service(self, usuario: UsuarioLoginModel):
-        user_found = await userRepository.buscar_usuario_por_email(usuario.email)
+    async def login_service(self, user: UserLoginModel):
+        user_found = await userRepository.find_user_by_email(user.email)
 
         if not user_found:
-            return ResponseDTO("E-mail ou Senha incorretos.", "", 401)
+            return ResponseDTO("E-mail or password incorrect.", "", 401)
         else:
-            if authUtil.verificar_senha(usuario.senha, user_found.senha):
-                return ResponseDTO("Login realizado com sucesso!", user_found, 200)
+            if authUtil.check_password(user.password, user_found.password):
+                return ResponseDTO("Login successfully!", user_found, 200)
             else:
-                return ResponseDTO("E-mail ou Senha incorretos.", "", 401)
+                return ResponseDTO("E-mail or password incorrect.", "", 401)
 
     async def find_logged_user(self, authorization: str) -> UserModel:
         token = authorization.split(' ')[1]
         payload = self.decode_jwt(token)
 
-        user_result = await usuarioService.find_user(payload["user_id"])
+        user_result = await userService.find_user(payload["user_id"])
 
 
-        usuario_logado = user_result.dados
+        logged_user = user_result.dada
 
-        return usuario_logado
+        return logged_user

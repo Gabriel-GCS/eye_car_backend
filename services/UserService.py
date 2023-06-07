@@ -4,7 +4,7 @@ from datetime import datetime
 from bson import ObjectId
 
 from dtos.ResponseDTO import ResponseDTO
-from models.UsuarioModel import UserCreateModel, UserUpdateModel
+from models.UserModel import UserCreateModel, UserUpdateModel
 from providers.AWSProvider import AWSProvider
 from repositories.UserRepository import UserRepository
 
@@ -30,15 +30,15 @@ class UserService:
                     )
 
                     new_user = await userRepository.update_user(new_user.id, {"photo": url_photo})
-                except Exception as erro:
-                    print(erro)
+                except Exception as error:
+                    print(error)
 
                 return ResponseDTO("User created successfully", new_user, 201)
 
-        except Exception as erro:
-            print(erro)
+        except Exception as error:
+            print(error)
 
-            return ResponseDTO("Erro interno no servidor", str(erro), 500)
+            return ResponseDTO("Internal server error", str(error), 500)
 
     async def find_user(self, id: str):
         try:
@@ -49,10 +49,10 @@ class UserService:
             else:
                 return ResponseDTO(f"User with id {id} not found.", "", 404)
 
-        except Exception as erro:
-            print(erro)
+        except Exception as error:
+            print(error)
 
-            return ResponseDTO("Internal server error", str(erro), 500)
+            return ResponseDTO("Internal server error", str(error), 500)
 
     async def list_users(self, name):
         try:
@@ -60,10 +60,10 @@ class UserService:
 
             return ResponseDTO("User list successfully", users_found, 200)
 
-        except Exception as erro:
-            print(erro)
+        except Exception as error:
+            print(error)
 
-            return ResponseDTO("Internal server error", str(erro), 500)
+            return ResponseDTO("Internal server error", str(error), 500)
 
     async def update_user(self, id, user_update: UserUpdateModel):
         try:
@@ -84,8 +84,8 @@ class UserService:
                     )
 
                     os.remove(photo_path)
-                except Exception as erro:
-                    print(erro)
+                except Exception as error:
+                    print(error)
 
                 user_dict['photo'] = url_photo if url_photo is not None else user_dict['photo']
 
@@ -95,7 +95,7 @@ class UserService:
             else:
                 return ResponseDTO(f"User with {id} not found.", "", 404)
 
-        except Exception as erro:
-            print(erro)
+        except Exception as error:
+            print(error)
 
-            return ResponseDTO("Internal server error", str(erro), 500)
+            return ResponseDTO("Internal server error", str(error), 500)

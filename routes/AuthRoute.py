@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Body, HTTPException
 
-from models.UsuarioModel import UsuarioLoginModel
+from models.UserModel import UserLoginModel
 from services.AuthService import AuthService
 
 router = APIRouter()
@@ -9,16 +9,16 @@ authService = AuthService()
 
 
 @router.post('/login')
-async def login(usuario: UsuarioLoginModel = Body(...)):
-    resultado = await authService.login_service(usuario)
+async def login(user: UserLoginModel = Body(...)):
+    result = await authService.login_service(user)
 
-    if not resultado.status == 200:
-        raise HTTPException(status_code=resultado.status, detail=resultado.mensagem)
+    if not result.status == 200:
+        raise HTTPException(status_code=result.status, detail=result.message)
 
-    del resultado.dados.senha
+    del result.dada.password
 
-    token = authService.gerar_token_jwt(resultado.dados.id)
+    token = authService.jwt_generate(result.dada.id)
 
-    resultado.dados.token = token
+    result.dada.token = token
 
-    return resultado
+    return result

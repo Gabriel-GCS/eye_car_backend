@@ -4,7 +4,7 @@ import motor.motor_asyncio
 from bson import ObjectId
 
 from decouple import config
-from models.UsuarioModel import UserCreateModel, UserModel
+from models.UserModel import UserCreateModel, UserModel
 from utils.AuthUtil import AuthUtil
 from utils.ConverterUtil import ConverterUtil
 
@@ -25,7 +25,7 @@ class UserRepository:
         user.password = authUtil.password_encrypt(user.password)
 
         user_dict = {
-            "name": user.nome,
+            "name": user.name,
             "email": user.email,
             "password": user.password,
         }
@@ -34,7 +34,7 @@ class UserRepository:
 
         new_user = await user_collection.find_one({ "_id": user_created.inserted_id })
 
-        return converterUtil.usuario_converter(new_user)
+        return converterUtil.user_converter(new_user)
 
     async def list_users(self, name) -> List[UserModel]:
         users_found = user_collection.find({
@@ -55,33 +55,33 @@ class UserRepository:
         user = await user_collection.find_one({"_id": ObjectId(id)})
 
         if user:
-            return converterUtil.usuario_converter(user)
+            return converterUtil.user_converter(user)
 
     async def find_user_by_email(self, email: str) -> UserModel:
-        usuario = await user_collection.find_one({"email": email})
+        user = await user_collection.find_one({"email": email})
 
-        if usuario:
-            return converterUtil.usuario_converter(usuario)
+        if user:
+            return converterUtil.user_converter(user)
 
-    async def update_user(self, id: str, dados_usuario: dict) -> UserModel:
-        if "senha" in dados_usuario:
-            dados_usuario['senha'] = authUtil.gerar_senha_criptografada(dados_usuario['senha'])
+    async def update_user(self, id: str, data_user: dict) -> UserModel:
+        if "password" in data_user:
+            data_user['password'] = authUtil.password_encrypt(data_user['password'])
 
-        usuario = await user_collection.find_one({"_id": ObjectId(id)})
+        user = await user_collection.find_one({"_id": ObjectId(id)})
 
-        if usuario:
+        if user:
             await user_collection.update_one(
-                {"_id": ObjectId(id)}, {"$set": dados_usuario}
+                {"_id": ObjectId(id)}, {"$set": data_user}
             )
 
-            usuario_encontrado = await user_collection.find_one({
+            user_found = await user_collection.find_one({
                 "_id": ObjectId(id)
             })
 
-            return converterUtil.usuario_converter(usuario_encontrado)
+            return converterUtil.user_converter(user_found)
 
     async def delete_user(self, id: str):
-        usuario = await user_collection.find_one({"_id": ObjectId(id)})
+        user = await user_collection.find_one({"_id": ObjectId(id)})
 
-        if usuario:
+        if user:
             await user_collection.delete_one({"_id": ObjectId(id)})
