@@ -6,7 +6,6 @@ from utils.DecoratorUtil import DecoratorUtil
 
 decoratorUtil = DecoratorUtil()
 
-
 class UserModel(BaseModel):
     id: str = Field(...)
     name: str = Field(...)

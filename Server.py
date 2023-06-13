@@ -3,7 +3,7 @@ import uvicorn
 from decouple import config
 
 if __name__ == "__main__":
-    PORT = config("PORT")
+    PORT = int(config("PORT"))
 
     if not PORT:
         PORT = 5000
