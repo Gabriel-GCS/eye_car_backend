@@ -17,26 +17,27 @@ class CarRepository:
     async def find_car(self, id : str):
         
         try:
-            car = await MongoDB().cars_collection.find_one({"_id" : ObjectId(id)})
-            return converterUtil.car_converter(car)
+            car = MongoDB().cars_collection.find_one({"_id" : ObjectId(id)})
+            car['_id'] = str(car['_id'])
+            return car
         
         except Exception as error:
             print(error)
             return ResponseDTO("Internal server error", str(error), 500)
         
-    async def update_like_car(car_id : str, total: int):
+    async def update_like_car(self, car_id : str, total: int):
         try:
             
-            await MongoDB().cars_collection.update_one({"_id" : ObjectId(car_id)}, {"likes" : total})
+            MongoDB().cars_collection.update_one({"_id" : ObjectId(car_id)}, {"$set":{"likes" : total}})
 
         except Exception as error:
             print(error)
             return ResponseDTO("Internal server error", str(error), 500)
         
-    async def update_favorite_car(car_id : str, total: int):
+    async def update_favorite_car(self, car_id : str, total: int):
         try:
             
-            await MongoDB().cars_collection.update_one({"_id" : ObjectId(car_id)}, {"favorites" : total})
+            MongoDB().cars_collection.update_one({"_id" : ObjectId(car_id)}, {"$set" : {"favorites" : total}})
 
         except Exception as error:
             print(error)

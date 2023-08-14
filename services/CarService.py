@@ -1,19 +1,21 @@
 import datetime
 from dtos.ResponseDTO import ResponseDTO
 from repositories.CarRepository import CarRepository
+from repositories.HistoricRepository import HistoricRepository
+from services.AuthService import AuthService
 
-
+authService = AuthService()
 carRepository = CarRepository()
+historicRepository = HistoricRepository()
 
 class CarService:
-    async def find_car(self, id: str):
+    async def find_car(self, id: str, user_id):
         try:
             car_found = await carRepository.find_car(id)
 
             if car_found:
-                time = datetime.now()
+                await historicRepository.register_historic(user_id, id)
 
-                
                 return ResponseDTO("Car Found.", car_found, 200)
             else:
                 return ResponseDTO(f"Car with id {id} not found.", "", 404) 

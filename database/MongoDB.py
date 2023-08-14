@@ -23,3 +23,4 @@ class MongoDB(metaclass=SingletonMeta):
         self.cars_collection = self.db_name["cars"]
         self.users_collection = self.db_name["users"]
         self.user_car_collection = self.db_name["user_car"]
+        self.historic_collection = self.db_name["historic"]

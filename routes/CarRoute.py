@@ -30,13 +30,14 @@ async def list_cars(
         raise error
     
 @router.get(
-    '/{car_id}',
+    '/id',
     response_description='Route to list one car',
     dependencies=[Depends(token_verify)]
 )
 async def info_car(car_id: str, authorization: str = Header(default='')):
     try:
-        result = await carService.find_car(car_id)
+        user_logged = await authService.find_logged_user(authorization)
+        result = await carService.find_car(car_id, user_logged.id)
 
         if not result.status == 200:
              raise HTTPException(status_code=result.status, detail=result.message)

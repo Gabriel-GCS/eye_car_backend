@@ -38,17 +38,17 @@ class UserCarService:
     async def like_car(self, id:str, car_id: str):
         try:
             car_found = await carRepository.find_car(car_id)
-            found_like = await userRepository.found_like(id, car_found.id)
+            found_like = await userRepository.found_like(id, car_found['_id'])
 
             if found_like:
-                await userRepository.remove_like(id, car_found.id)
+                await userRepository.remove_like(id, car_found['_id'])
 
             else:
-                await userRepository.add_like(id, car_found.id)
+                await userRepository.add_like(id, car_found['_id'])
 
-            total = await userRepository.count_like(id, car_found.id)
+            total = await userRepository.count_like(id, car_found['_id'])
 
-            await carRepository.update_like_car(car_found.id, total)
+            await carRepository.update_like_car(car_found['_id'], total)
 
             return ResponseDTO("car liked", "", 200)
                  
@@ -58,19 +58,19 @@ class UserCarService:
     async def favorite_car(self, id:str, car_id: str):
         try:
             car_found = await carRepository.find_car(car_id)
-            found_favorite = await userRepository.found_favorite(id, car_found.id)
+            found_favorite = await userRepository.found_favorite(id, car_found['_id'])
 
             if found_favorite:
-                await userRepository.remove_favorite(id, car_found.id)
+                await userRepository.remove_favorite(id, car_found['_id'])
 
             else:
-                await userRepository.add_favorite(id, car_found.id)
+                await userRepository.add_favorite(id, car_found['_id'])
 
-            total = await userRepository.count_favorite(id, car_found.id)
+            total = await userRepository.count_favorite(id, car_found['_id'])
 
-            await carRepository.update_favorite_car(car_found.id, total)
+            await carRepository.update_favorite_car(car_found['_id'], total)
 
-            return ResponseDTO("car liked", "", 200)
+            return ResponseDTO("car favorited", "", 200)
                  
         except Exception as error:
              print(error)

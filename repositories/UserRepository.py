@@ -80,13 +80,12 @@ class UserRepository:
 
     async def found_like(self, id: str, car_id:str):
         car = MongoDB().users_collection.find_one({"_id" : ObjectId(id), "likes" : ObjectId(car_id)})
-
         return car
     
     async def remove_like(self, id: str, car_id:str):
         MongoDB().users_collection.update_one(
-            {"_id" : ObjectId(id), "like" : ObjectId(car_id)},
-            {"$unset" : "likes.$"}
+            {"_id": ObjectId(id)},
+            {"$pull": {"likes": ObjectId(car_id)}}
         )
 
     async def add_like(self, id: str, car_id: str):
@@ -101,15 +100,24 @@ class UserRepository:
 
         total = MongoDB().users_collection.aggregate([
             {
-                "$match" : {
-                    "$elemMatch" : {
-                        "likes" : {"$in" : ObjectId(car_id)}
+            "$addFields": {
+                "matching_likes": {
+                    "$filter": {
+                        "input": "$likes",
+                        "as": "like",
+                        "cond": { "$eq": ["$$like", ObjectId(car_id)] }
                     }
                 }
-            },
-            {
-                "$count": "total"
             }
+        },
+        {
+            "$match": {
+                "matching_likes": { "$ne": [] }
+            }
+        },
+        {
+            "$count": "total"
+        }
         ])
 
         total = total.next()["total"] if total.alive else 0
@@ -123,8 +131,8 @@ class UserRepository:
     
     async def remove_favorite(self, id: str, car_id:str):
         MongoDB().users_collection.update_one(
-            {"_id" : ObjectId(id), "favorites" : ObjectId(car_id)},
-            {"$unset" : "favorites.$"}
+            {"_id": ObjectId(id)},
+            {"$pull": {"favorites": ObjectId(car_id)}}
         )
 
     async def add_favorite(self, id: str, car_id: str):
@@ -139,15 +147,24 @@ class UserRepository:
 
         total = MongoDB().users_collection.aggregate([
             {
-                "$match" : {
-                    "$elemMatch" : {
-                        "favorites" : {"$in" : ObjectId(car_id)}
+            "$addFields": {
+                "matching_favorites": {
+                    "$filter": {
+                        "input": "$favorites",
+                        "as": "favorite",
+                        "cond": { "$eq": ["$$favorite", ObjectId(car_id)] }
                     }
                 }
-            },
-            {
-                "$count": "total"
             }
+        },
+        {
+            "$match": {
+                "matching_favorites": { "$ne": [] }
+            }
+        },
+        {
+            "$count": "total"
+        }
         ])
 
         total = total.next()["total"] if total.alive else 0

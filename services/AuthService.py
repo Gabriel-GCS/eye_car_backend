@@ -23,7 +23,7 @@ class AuthService:
     def jwt_generate(self, user_id: str) -> str:
         payload = {
             "user_id": user_id,
-            "time_expiration": time.time() + 6000
+            "time_expiration": time.time() + 30.44 * 86400
         }
 
         token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")
