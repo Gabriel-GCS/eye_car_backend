@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
 
 app.include_router(UserRoute, tags=["Users"], prefix="/api/user")
-app.include_router(AuthRoute, tags=["Login"], prefix="/api/login")
+app.include_router(AuthRoute, tags=["Login"], prefix="/api/auth")
 app.include_router(CarRoute, tags=["Cars"], prefix="/api/car")
 app.include_router(UserCarRoute, tags=["User_Car"], prefix="/api/user_car")
 

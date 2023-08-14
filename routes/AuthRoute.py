@@ -15,10 +15,10 @@ async def login(user: UserLoginModel = Body(...)):
     if not result.status == 200:
         raise HTTPException(status_code=result.status, detail=result.message)
 
-    del result.dada.password
+    del result.data.password
 
-    token = authService.jwt_generate(result.dada.id)
+    token = authService.jwt_generate(result.data.id)
 
-    result.dada.token = token
+    result.data.token = token
 
     return result

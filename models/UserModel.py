@@ -57,12 +57,11 @@ class UserLoginModel(BaseModel):
         }
 
 
-@decoratorUtil.form_body
 class UserUpdateModel(BaseModel):
-    name: str = Field(...)
-    email: EmailStr = Field(...)
-    password: str = Field(...)
-    photo: UploadFile = Field(...)
+    name: str = Field(None)
+    email: EmailStr = Field(None)
+    password: str = Field(None)
+    photo: UploadFile = Field(None)
 
     class Config:
         schema_extra = {

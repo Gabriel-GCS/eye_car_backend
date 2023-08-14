@@ -44,7 +44,7 @@ class AuthService:
 
     async def login_service(self, user: UserLoginModel):
         user_found = await userRepository.find_user_by_email(user.email)
-
+        
         if not user_found:
             return ResponseDTO("E-mail or password incorrect.", "", 401)
         else:
@@ -60,6 +60,6 @@ class AuthService:
         user_result = await userService.find_user(payload["user_id"])
 
 
-        logged_user = user_result.dada
+        logged_user = user_result.data
 
         return logged_user

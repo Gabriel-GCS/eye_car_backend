@@ -1,3 +1,4 @@
+import datetime
 from dtos.ResponseDTO import ResponseDTO
 from repositories.CarRepository import CarRepository
 
@@ -10,6 +11,9 @@ class CarService:
             car_found = await carRepository.find_car(id)
 
             if car_found:
+                time = datetime.now()
+
+                
                 return ResponseDTO("Car Found.", car_found, 200)
             else:
                 return ResponseDTO(f"Car with id {id} not found.", "", 404) 

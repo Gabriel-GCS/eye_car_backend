@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Header
+from fastapi import APIRouter, Depends, HTTPException, Header
 
 from middlewares.JWTMiddleware import token_verify
 from services.AuthService import AuthService
@@ -24,6 +24,23 @@ async def list_cars(
     try:
         result = await carService.list_car(limit,page,order_by,order_type,filter_by, filter_data)
 
+        return result
+
+    except Exception as error:
+        raise error
+    
+@router.get(
+    '/{car_id}',
+    response_description='Route to list one car',
+    dependencies=[Depends(token_verify)]
+)
+async def info_car(car_id: str, authorization: str = Header(default='')):
+    try:
+        result = await carService.find_car(car_id)
+
+        if not result.status == 200:
+             raise HTTPException(status_code=result.status, detail=result.message)
+        
         return result
 
     except Exception as error:

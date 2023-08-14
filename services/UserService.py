@@ -14,7 +14,7 @@ userRepository = UserRepository()
 
 class UserService:
 
-    async def create_user(self, user: UserCreateModel, photo_path):
+    async def create_user(self, user: UserCreateModel):
         try:
             user_found = await userRepository.find_user_by_email(user.email)
 
@@ -23,15 +23,15 @@ class UserService:
             else:
                 new_user = await userRepository.create_user(user)
 
-                try:
-                    url_photo = awsProvider.upload_arquivo_s3(
-                        f'photo-profile/{new_user.id}.png',
-                        photo_path
-                    )
+                # try:
+                #     url_photo = awsProvider.upload_arquivo_s3(
+                #         f'photo-profile/{new_user.id}.png',
+                #         photo_path
+                #     )
 
-                    new_user = await userRepository.update_user(new_user.id, {"photo": url_photo})
-                except Exception as error:
-                    print(error)
+                #     new_user = await userRepository.update_user(new_user.id, {"photo": url_photo})
+                # except Exception as error:
+                #     print(error)
 
                 return ResponseDTO("User created successfully", new_user, 201)
 
@@ -67,29 +67,38 @@ class UserService:
 
     async def update_user(self, id, user_update: UserUpdateModel):
         try:
+            final_user = {}
             user_found = await userRepository.find_user(id)
 
             if user_found:
                 user_dict = user_update.__dict__
+                
+                if user_update.photo:
+                    try:
+                        photo_path = f'files/photo-{datetime.now().strftime("%H%M%S")}.png'
 
-                try:
-                    photo_path = f'files/photo-{datetime.now().strftime("%H%M%S")}.png'
+                        with open(photo_path, 'wb+') as arquivo:
+                            arquivo.write(user_update.photo.file.read())
 
-                    with open(photo_path, 'wb+') as arquivo:
-                        arquivo.write(user_update.photo.file.read())
+                        url_photo = awsProvider.upload_arquivo_s3(
+                            f'photo-profile/{id}.png',
+                            photo_path
+                        )
 
-                    url_photo = awsProvider.upload_arquivo_s3(
-                        f'photo-profile/{id}.png',
-                        photo_path
-                    )
+                        os.remove(photo_path)
+                    except Exception as error:
+                        print(error)
 
-                    os.remove(photo_path)
-                except Exception as error:
-                    print(error)
+                    user_dict['photo'] = url_photo if url_photo is not None else user_dict['photo']
+                print(user_update)
+                if user_update.name:
+                    final_user['name'] = user_update.name
+                if user_update.email:
+                    final_user['email'] = user_update.name
+                if user_update.password:
+                    final_user['password'] = user_update.name
 
-                user_dict['photo'] = url_photo if url_photo is not None else user_dict['photo']
-
-                user_updated = await userRepository.update_user(id, user_dict)
+                user_updated = await userRepository.update_user(id, final_user)
 
                 return ResponseDTO("User updated.", user_updated, 200)
             else:
