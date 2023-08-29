@@ -31,6 +31,25 @@ async def add_car_user (car_id: str, authorization: str = Header(default='')):
     except Exception as error:
         raise error
     
+@router.get(
+    '/list_user_cars',
+    response_description= 'Route to list user cars', 
+    dependencies=[Depends(token_verify)]
+    )
+async def list_car_user (authorization: str = Header(default='')):
+    try:
+        logged_user = await authService.find_logged_user(authorization)
+
+        result = await userCarService.list_user_cars(logged_user.id)
+
+        if not result.status == 200:
+             raise HTTPException(status_code=result.status, detail=result.message)
+        
+        return result
+
+    except Exception as error:
+        raise error
+    
 @router.put(
     '/like/{car_id}',
     response_description= 'Route to like car', 

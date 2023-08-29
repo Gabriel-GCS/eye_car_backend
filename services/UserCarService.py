@@ -14,7 +14,12 @@ class UserCarService:
         try:
             car_found = await carRepository.find_car(car_id)
 
-            await userCarRepository.add_car_user(id, car_found.id)
+            user_car_found = await userCarRepository.found_car_user(id, car_id)
+
+            if user_car_found:
+                return ResponseDTO(f'Car already added', "", 400)
+            
+            await userCarRepository.add_car_user(id, car_found['_id'])
 
             return ResponseDTO("car add to user", "", 200)
 
@@ -25,8 +30,7 @@ class UserCarService:
         
     async def list_user_cars (self, id: str):
         try:
-
-            result = userCarRepository.list_user_cars(id)
+            result = await userCarRepository.list_user_cars(id)
 
             return ResponseDTO("car add to user", result, 200)
 
@@ -47,6 +51,7 @@ class UserCarService:
                 await userRepository.add_like(id, car_found['_id'])
 
             total = await userRepository.count_like(id, car_found['_id'])
+
 
             await carRepository.update_like_car(car_found['_id'], total)
 

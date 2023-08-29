@@ -22,9 +22,9 @@ class UserRepository:
             "password": user.password,
         }
 
-        user_created = await MongoDB().users_collection.insert_one(user_dict)
+        user_created = MongoDB().users_collection.insert_one(user_dict)
 
-        new_user = await MongoDB().users_collection.find_one({ "_id": user_created.inserted_id })
+        new_user = MongoDB().users_collection.find_one({ "_id": user_created.inserted_id })
 
         return converterUtil.user_converter(new_user)
 

@@ -11,10 +11,10 @@ carService = CarService()
 @router.get(
     '/list',
     response_description='Route to list all cars with filter',
-    dependencies=[Depends(token_verify)]
+    #dependencies=[Depends(token_verify)]
 )
 async def list_cars(
-    authorization: str = Header(default=''),
+    #authorization: str = Header(default=''),
     limit: int = 10, page: int = 1,
     order_by: str = None,
     order_type: str = None,
