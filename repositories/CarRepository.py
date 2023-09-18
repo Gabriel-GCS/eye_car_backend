@@ -51,11 +51,11 @@ class CarRepository:
             project_query = {
                 "$project" : {
                     "id" : 1,
-                    "Marca" : 1,
-                    "Modelo" : 1,
-                    "Ano" : 1,
-                    "Versão" : 1,
-                    "Preço" : 1,
+                    "brand" : 1,
+                    "model" : 1,
+                    "year" : 1,
+                    "version" : 1,
+                    "price" : 1,
                     str(filter_by) : 1,
                     str(order_by) : 1
                 }
